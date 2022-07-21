@@ -97,17 +97,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             reloadSegments()
         }
     }
-
-    fileprivate var _underlineHeight: CGFloat = 4.0
-    @objc public dynamic var underlineHeight: CGFloat {
-        get { return _underlineHeight }
-        set {
-            if newValue != _underlineHeight {
-                _underlineHeight = newValue
-                reloadSegments()
-            }
-        }
-    }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
     @objc public dynamic var selectedSegmentContentColor:UIColor? {
@@ -220,9 +209,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content and/or image as content.
      */
-    @objc public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
+    @objc public func insertSegment(withTitle title: String?,
+                                    image: UIImage?,
+                                    font: UIFont,
+                                    at index: Int) {
         let segment = SegmentData()
         segment.title = title
+        segment.normalFont = font
         segment.image = image?.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
         
@@ -425,6 +418,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var highlightedAttributedTitle:NSAttributedString?
         var selectedAttributedTitle:NSAttributedString?
         var image:UIImage?
+        var normalFont: UIFont?
     }
     
     // MARK : - CollectionViewController
@@ -478,10 +472,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier, for: indexPath) as! ImageOnLeftSegmentCollectionViewCell
                 cell.titleLabel.text = data.title
                 cell.imageView.image = data.image
-                
+                cell.titleLabel.font = data.normalFont
                 segmentCell = cell
             }
-            segmentCell.underlineHeight = segmentedControl.underlineHeight
+            
             segmentCell.showUnderline = segmentedControl.underlineSelected
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
@@ -538,18 +532,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private class BaseSegmentCollectionViewCell: UICollectionViewCell {
         static let textPadding:CGFloat = 8.0
         static let imageToTextMargin:CGFloat = 14.0
-        static let imageSize:CGFloat = 14.0
+        static let imageSize:CGFloat = 24.0
         static let defaultFont = UIFont.systemFont(ofSize: 14)
         static let defaultTextColor = UIColor.darkGray
         
         var underlineView:UIView?
-        var underlineHeight: CGFloat = 4.0 {
-            didSet {
-                if oldValue != underlineHeight {
-                    setNeedsUpdateConstraints()
-                }
-            }
-        }
         public var contentColor:UIColor?
         public var selectedContentColor:UIColor?
         
@@ -599,6 +586,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func configureConstraints() {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
+                underline.heightAnchor.constraint(equalToConstant: 2.0).isActive = true
                 underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
@@ -685,10 +673,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
-
-            if let underline = underlineView {
-                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
-            }
+            
             NSLayoutConstraint.activate(variableConstraints)
         }
     }
@@ -739,10 +724,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            
-            if let underline = underlineView {
-                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
-            }
             
             NSLayoutConstraint.activate(variableConstraints)
         }
@@ -830,10 +811,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: stackView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             
-            if let underline = underlineView {
-                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
-            }
-            
             NSLayoutConstraint.activate(variableConstraints)
         }
     }
@@ -848,6 +825,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private class ImageOnLeftSegmentCollectionViewCell: BaseImageSegmentCollectionViewCell {
         override func configure(){
             super.configure()
+            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
             var imgFrame = imageView.frame
             imgFrame.size = CGSize(width: BaseSegmentCollectionViewCell.imageSize, height: BaseSegmentCollectionViewCell.imageSize)
             imageView.frame = imgFrame
