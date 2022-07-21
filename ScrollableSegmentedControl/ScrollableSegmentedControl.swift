@@ -254,6 +254,17 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         return safeSegmentData(forIndex: segment).title
     }
     
+    /**
+     Returns the Image of the specified segment.
+     */
+    @objc public func imageForSegment(at segment: Int) -> UIImage? {
+        if segmentsData.count == 0 {
+            return nil
+        }
+        
+        return safeSegmentData(forIndex: segment).image
+    }
+    
     
     /**
      The index number identifying the selected segment (that is, the last segment touched).
