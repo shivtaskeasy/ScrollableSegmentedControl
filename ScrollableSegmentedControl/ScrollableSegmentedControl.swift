@@ -215,7 +215,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                                     at index: Int) {
         let segment = SegmentData()
         segment.title = title
-        segment.normalFont = font
+        configureAttributedTitlesForSegment(segment)
+       // segment.normalFont = font
         segment.image = image?.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
         
@@ -482,8 +483,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             case .imageOnLeft:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier, for: indexPath) as! ImageOnLeftSegmentCollectionViewCell
                 cell.titleLabel.text = data.title
-                cell.imageView.image = data.image
-                cell.titleLabel.font = data.normalFont
+                if data.image != nil {
+                    cell.imageView.image = data.image
+                    cell.imageView.isHidden = false
+                } else {
+                    cell.imageView.image = UIImage(named: "")
+                    cell.imageView.isHidden = true
+                }
                 segmentCell = cell
             }
             
@@ -744,11 +750,9 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         let titleLabel = UILabel()
         let imageView = UIImageView()
         internal let stackView = UIStackView()
-        
         override var contentColor:UIColor? {
             didSet {
                 titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
             }
         }
         
@@ -765,12 +769,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 } else {
                     titleLabel.isHighlighted = isHighlighted
                 }
-                
-                if isHighlighted {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
             }
         }
         
@@ -779,22 +777,23 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 if isSelected {
                     if let title = super.selectedAttributedTitle {
                         titleLabel.attributedText = title
+                        imageView.tintColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
                     } else {
                         titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                        imageView.tintColor = .black
                     }
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
                 } else {
                     if let title = super.normalAttributedTitle {
                         titleLabel.attributedText = title
                     } else {
                         titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
                     }
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    imageView.tintColor = .black
                 }
             }
         }
         
-        override func configure(){
+        override func configure() {
             super.configure()
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
             imageView.contentMode = .scaleAspectFit
@@ -834,7 +833,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     }
     
     private class ImageOnLeftSegmentCollectionViewCell: BaseImageSegmentCollectionViewCell {
-        override func configure(){
+        override func configure() {
             super.configure()
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -843,7 +842,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             imageView.frame = imgFrame
             imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
             imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            
+            imageView.tintColor = UIColor.black
             stackView.axis = .horizontal
         }
     }
