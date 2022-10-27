@@ -485,6 +485,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 cell.titleLabel.text = data.title
                 if data.image != nil {
                     cell.imageView.image = data.image
+                    cell.imageView.tintColor = cell.titleLabel.textColor
                     cell.imageView.isHidden = false
                 } else {
                     cell.imageView.image = UIImage(named: "")
@@ -780,7 +781,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                         imageView.tintColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
                     } else {
                         titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-                        imageView.tintColor = .black
+                        imageView.tintColor = titleLabel.textColor
                     }
                 } else {
                     if let title = super.normalAttributedTitle {
@@ -788,7 +789,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     } else {
                         titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
                     }
-                    imageView.tintColor = .black
+                    imageView.tintColor = titleLabel.textColor
                 }
             }
         }
@@ -842,8 +843,9 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             imageView.frame = imgFrame
             imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
             imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            imageView.tintColor = UIColor.black
+            imageView.tintColor = titleLabel.textColor
             stackView.axis = .horizontal
         }
     }
 }
+
