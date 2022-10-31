@@ -754,6 +754,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         override var contentColor:UIColor? {
             didSet {
                 titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                imageView.tintColor = titleLabel.textColor
             }
         }
         
